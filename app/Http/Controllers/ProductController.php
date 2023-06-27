@@ -8,6 +8,7 @@ use App\Models\Variant;
 use Illuminate\Http\Request;
 use App\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
+use App\Models\ProductVariantPrice;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -154,6 +155,30 @@ class ProductController extends Controller
                 ]);
             }
         }
+        
+        $productPreview = $request->input('product_preview');
+        foreach ($productPreview as $preview) {
+            $variantArray = explode('/', trim($preview['variant'], '/'));
+            $firstIDs = [];
+
+            foreach ($variantArray as $value) {
+                $firstID = ProductVariant::where('variant', $value)
+                    ->value('id');
+                if ($firstID) {
+                    $firstIDs[] = $firstID;
+                }
+            }
+            ProductVariantPrice::create([
+                'product_variant_one' => $firstIDs[0] ?? null,
+                'product_variant_two' => $firstIDs[1] ?? null,
+                'product_variant_three' => $firstIDs[2] ?? null,
+                'price' => $preview['price'],
+                'stock' => $preview['stock'],
+                'product_id' => $productID,
+            ]);
+        }
+
+        return redirect('product');
     }
 
 
