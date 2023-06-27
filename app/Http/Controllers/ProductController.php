@@ -8,6 +8,7 @@ use App\Models\Variant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProductController extends Controller
@@ -126,7 +127,17 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-
+        $validator = Validator::make($request->all(), [
+            'product_name' => 'required',
+            'product_sku' => 'required|unique:products,sku',
+            'product_description' => 'required',
+        ]);
+        $product = Product::create([
+            'title' => $request->input('product_name'),
+            'sku' => $request->input('product_sku'),
+            'description' => $request->input('product_description'),
+        ]);
+        $productID = $product->id;
     }
 
 
