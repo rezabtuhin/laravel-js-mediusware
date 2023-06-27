@@ -43,8 +43,8 @@
                     <thead>
                     <tr>
                         <th>#</th>
-                        <th>Title</th>
-                        <th>Description</th>
+                        <th width="200px">Title</th>
+                        <th width="300px">Description</th>
                         <th>Variant</th>
                         <th width="150px">Action</th>
                     </tr>
