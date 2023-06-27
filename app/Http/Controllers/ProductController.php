@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\Product;
 use App\Models\Variant;
 use Illuminate\Http\Request;
+use App\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Validator;
@@ -138,6 +139,21 @@ class ProductController extends Controller
             'description' => $request->input('product_description'),
         ]);
         $productID = $product->id;
+
+        $productVariants = $request->input('product_variant');
+
+        foreach ($productVariants as $variant) {
+            $optionID = $variant['option'];
+            $values = $variant['value'];
+
+            foreach ($values as $value) {
+                ProductVariant::create([
+                    'variant' => $value,
+                    'variant_id' => $optionID,
+                    'product_id' => $productID,
+                ]);
+            }
+        }
     }
 
 
