@@ -7,6 +7,8 @@ use App\Models\Product;
 use App\Models\Variant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProductController extends Controller
 {
@@ -47,6 +49,17 @@ class ProductController extends Controller
 
         return view('products.index', compact('products'));
     }
+
+    public function paginate($items, $perPage = 4, $page = null)
+    {
+        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
+        $total = count($items);
+        $currentpage = $page;
+        $offset = ($currentpage * $perPage) - $perPage;
+        $itemstoshow = array_slice($items, $offset, $perPage);
+        return new LengthAwarePaginator($itemstoshow, $total, $perPage);
+    }
+
 
     /**
      * Show the form for creating a new resource.
