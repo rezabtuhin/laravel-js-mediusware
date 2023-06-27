@@ -44,10 +44,10 @@ class ProductController extends Controller
                 }),
             ];
         })->toArray();
-
+        $count = count($products);
         $products = $this->paginate($products, 3);
 
-        return view('products.index', compact('products'));
+        return view('products.index', compact('products', 'count'));
     }
 
     public function paginate($items, $perPage = 4, $page = null)
