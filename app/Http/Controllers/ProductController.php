@@ -19,6 +19,15 @@ class ProductController extends Controller
      */
     public function index()
     {
+
+        $variants = DB::table('product_variants as pv')
+            ->join('variants as v', 'pv.variant_id', '=', 'v.id')
+            ->groupBy('pv.variant', 'v.title')
+            ->orderBy('pv.variant_id')
+            ->select('pv.variant', 'v.title')
+            ->get();
+        $groupedVariants = $variants->groupBy('title');
+
         $results = DB::table('products')
             ->leftJoin('product_variant_prices', 'products.id', '=', 'product_variant_prices.product_id')
             ->leftJoin('product_variants AS pv1', 'product_variant_prices.product_variant_one', '=', 'pv1.id')
@@ -47,7 +56,7 @@ class ProductController extends Controller
         $count = count($products);
         $products = $this->paginate($products, 3);
         $products->withPath('/product');
-        return view('products.index', compact('products', 'count'));
+        return view('products.index', compact('products', 'count', 'groupedVariants'));
     }
 
     public function paginate($items, $perPage = 4, $page = null)
