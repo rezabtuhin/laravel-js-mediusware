@@ -51,23 +51,31 @@
                     </thead>
 
                     <tbody>
-
+                        @php
+                            $i = 1;
+                        @endphp
+                    @foreach ($products as $product)
                     <tr>
-                        <td>1</td>
-                        <td>T-Shirt <br> Created at : 25-Aug-2020</td>
-                        <td>Quality product in low cost</td>
+                        <td>@php echo $i; @endphp</td>
+                        <td>{{ $product['title'] }} <br> Created at : {{ $product['created'] }}</td>
+                        <td>{{ Illuminate\Support\Str::limit($product['description'], 100) }}</td>
                         <td>
                             <dl class="row mb-0" style="height: 80px; overflow: hidden" id="variant">
 
+                                @foreach ($product['variants'] as $variant)
                                 <dt class="col-sm-3 pb-0">
-                                    SM/ Red/ V-Nick
+                                    {{ $variant['product_variant_one'] }} / {{ $variant['product_variant_two'] }}
+                                    @if (isset($variant['product_variant_three']))
+                                        / {{ $variant['product_variant_three'] }}
+                                    @endif
                                 </dt>
                                 <dd class="col-sm-9">
                                     <dl class="row mb-0">
-                                        <dt class="col-sm-4 pb-0">Price : {{ number_format(200,2) }}</dt>
-                                        <dd class="col-sm-8 pb-0">InStock : {{ number_format(50,2) }}</dd>
+                                        <dt class="col-sm-4 pb-0">Price : {{ number_format($variant['price'],2) }}</dt>
+                                        <dd class="col-sm-8 pb-0">InStock : {{ number_format($variant['stock']) }}</dd>
                                     </dl>
                                 </dd>
+                                @endforeach
                             </dl>
                             <button onclick="$('#variant').toggleClass('h-auto')" class="btn btn-sm btn-link">Show more</button>
                         </td>
@@ -77,6 +85,10 @@
                             </div>
                         </td>
                     </tr>
+                    @php
+                        $i++;
+                    @endphp
+                    @endforeach
 
                     </tbody>
 
