@@ -17,7 +17,7 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
 
         $variants = DB::table('product_variants as pv')
@@ -33,9 +33,46 @@ class ProductController extends Controller
             ->leftJoin('product_variants AS pv1', 'product_variant_prices.product_variant_one', '=', 'pv1.id')
             ->leftJoin('product_variants AS pv2', 'product_variant_prices.product_variant_two', '=', 'pv2.id')
             ->leftJoin('product_variants AS pv3', 'product_variant_prices.product_variant_three', '=', 'pv3.id')
-            ->select('products.title', 'products.created_at', 'products.description', 'pv1.variant AS product_variant_one', 'pv2.variant AS product_variant_two', 'pv3.variant AS product_variant_three', 'product_variant_prices.price', 'product_variant_prices.stock')
-            ->get()
-            ->groupBy('title');
+            ->select('products.title', 'products.created_at', 'products.description', 'pv1.variant AS product_variant_one', 'pv2.variant AS product_variant_two', 'pv3.variant AS product_variant_three', 'product_variant_prices.price', 'product_variant_prices.stock');
+
+            
+        if ($request->has('title') || $request->has('variant') || $request->has('price_from') || $request->has('price_to') || $request->has('date')) {
+            $title = $request->input('title');
+            $variant = $request->input('variant');
+            $priceFrom = $request->input('price_from');
+            $priceTo = $request->input('price_to');
+            $date = $request->input('date');
+
+
+            if (!empty($title)) {
+                $results->where('products.title', 'like', '%' . $title . '%');
+            }
+
+            if (!empty($variant)) {
+                $results->where(function ($query) use ($variant) {
+                    $query->where('pv1.variant', 'like', '%' . $variant . '%')
+                        ->orWhere('pv2.variant', 'like', '%' . $variant . '%')
+                        ->orWhere('pv3.variant', 'like', '%' . $variant . '%');
+                });
+            }
+
+            if (!empty($priceFrom) && !empty($priceTo)) {
+                $results->whereBetween('product_variant_prices.price', [$priceFrom, $priceTo]);
+            }
+
+            if (!empty($date)) {
+                $results->whereDate('products.created_at', '>=', $date);
+            }
+
+            $results = $results->orderBy('products.id', 'asc')
+                ->get()
+                ->groupBy('title');
+
+        } else {
+            $results = $results->orderBy('products.id', 'asc')
+                ->get()
+                ->groupBy('title');
+        }
 
         $products = $results->map(function ($group) {
             return [
