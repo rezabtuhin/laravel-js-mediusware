@@ -46,7 +46,7 @@ class ProductController extends Controller
         })->toArray();
         $count = count($products);
         $products = $this->paginate($products, 3);
-
+        $products->withPath('/product');
         return view('products.index', compact('products', 'count'));
     }
 
